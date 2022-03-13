@@ -1,0 +1,22 @@
+---
+- name: install nginx and maria via roles  
+  hosts: local
+  become: true
+
+  roles:
+   - role: epel
+     tags: [epel]
+   - role: nginx
+     tags: [nginx]
+   - role: mariadb
+     tags: [mariadb]
+
+  post_tasks:
+    - name: check web site from control server
+      uri:
+        url: "http://{{ ansible_host }}:{{ nginx_port_no_tls }}"
+        return_content: true
+      connection: local
+      register: example_webpage_out
+      failed_when: example_webpage_out.status != 200
+
